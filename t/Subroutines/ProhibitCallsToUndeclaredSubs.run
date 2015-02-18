@@ -1,8 +1,8 @@
 ##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/t/Subroutines/ProhibitCallsToUndeclaredSubs.run $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
 ##############################################################################
 
 ## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.0 ]--
@@ -302,6 +302,75 @@ all_critic_ok() if not $@;
 if ( require Test::Perl::Critic ){
     all_critic_ok();
 }
+
+## name Readonly RT #41858
+## parms { exempt_subs => 'Readonly::Readonly Readonly::Scalar Readonly::Array Readonly::Hash' }
+## failures 0
+## cut
+
+use 5.010;
+use Readonly;
+Readonly my $HI => 50;
+Readonly::Scalar my $HI => 50;
+Readonly::Array my @HI => qw< foo bar >;
+Readonly::Hash my %HI => ( foo => 'bar' );
+say $HI;
+
+## name Many imported names RT #62184
+## failures 0
+## cut
+
+use Some::Thing 'foo', 'bar', 'quux', 'xyzzy';
+my $w = foo(123);
+my $x = bar(123);
+my $y = quux(123);
+my $z = xyzzy(123);
+
+## name Import with version number RT #43310
+## failures 0
+## cut
+
+use HTTP::Status '5.187' => qw{ HTTP_INTERNAL_SERVER_ERROR };
+HTTP_INTERNAL_SERVER_ERROR();
+
+use Frobozz 42 'bazzle', qw{ boozle };
+bazzle();
+boozle();
+
+## name Nested lists RT #36783
+## failures 0
+## cut
+
+use List::Util ( qw { min } );
+min( 1, 2 );
+
+use Scalar::Util ( ( 'blessed' ) );
+blessed( $foo );
+
+## name Loop labels with qualifiers RT #72022
+## failures 0
+## cut
+
+sub try_something { return 0 };
+
+FOO: while ($some_condition) {
+    next FOO if $bar;
+    # do something
+}
+
+BAR: while ($some_condition) {
+    try_something() or last BAR;
+}
+
+BAZ: while ($some_condition) {
+    redo ( BAZ ) if $bar;
+    # do something
+}
+
+BURFLE: while ($some_condition) {
+    try_something() or next ( BURFLE );
+}
+
 
 ##############################################################################
 # Local Variables:

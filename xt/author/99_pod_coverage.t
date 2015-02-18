@@ -1,18 +1,9 @@
 #!perl
 
-##############################################################################
-#     $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/t/99_pod_coverage.t $
-#    $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
-
 use strict;
 use warnings;
 use Test::More;
-
-eval 'use Test::Pod::Coverage 1.04'; ## no critic
-plan skip_all => 'Test::Pod::Coverage 1.00 requried to test POD' if $@;
+use Test::Pod::Coverage;
 
 {
     # HACK: Perl::Critic::Violation uses Pod::Parser to extract the

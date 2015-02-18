@@ -1,10 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
-
 package Perl::Critic::Policy::Modules::RequireExplicitInclusion;
 
 use strict;
@@ -29,7 +22,7 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 my $expl =
     'Without importing a package, it is unlikely that references to things inside it even exist.';
@@ -105,7 +98,15 @@ sub _find_class_method_calls {
                 return
                          $elem->isa('PPI::Token::Word')
                      &&  is_class_name( $elem )
-                     && !is_perl_builtin( $elem );
+                     && !is_perl_builtin( $elem )
+                     && '__PACKAGE__' ne $elem->content();  # RT 43314, 44609
+                     # From a design standpoint we should filter later, but
+                     # the violation code is generic. The patch included with
+                     # 44609, or adding '__PACKAGE__ to @builtin_packages,
+                     # would have also allowed, willy-nilly,
+                     # __PACKAGE__::foo() or $__PACKAGE__::foo, neither of
+                     # which is correct. So I just hid __PACKAGE__->foo() from
+                     # the violation logic. Mea culpa! Tom Wyant
             }
         );
 
@@ -236,7 +237,7 @@ Perl::Critic::Policy::Modules::RequireExplicitInclusion
 
 =head1 AFFILIATION
 
-This policy is part of L<Perl::Critic::StricterSubs>.
+This policy is part of L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs>.
 
 =head1 DESCRIPTION
 
@@ -396,7 +397,7 @@ None.
 
 =head1 DIAGNOSTICS
 
-=over 8
+=over
 
 =item C<Modules::RequireExplicitInclusion: Cannot cope with mutiple packages in file>
 
@@ -404,14 +405,14 @@ This warning happens when the file under analysis contains multiple packages,
 which is not currently supported.  This Policy will simply ignore any file
 with multiple packages.
 
-L<Perl::Critic> advises putting multiple packages in one file, and has
+L<Perl::Critic|Perl::Critic> advises putting multiple packages in one file, and has
 additional Policies to help enforce that.
 
 =back
 
 =head1 SEE ALSO
 
-L<Perl::Critic::Policy::Modules::ProhibitMultiplePackages>
+L<Perl::Critic::Policy::Modules::ProhibitMultiplePackages|Perl::Critic::Policy::Modules::ProhibitMultiplePackages>
 
 =head1 AUTHOR
 

@@ -1,10 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/Perl-Critic-StricterSubs/lib/Perl/Critic/Policy/Modules/ProhibitExportingUndeclaredSubs.pm $
-#     $Date: 2007-04-06 11:58:16 -0700 (Fri, 06 Apr 2007) $
-#   $Author: thaljef $
-# $Revision: 1391 $
-##############################################################################
-
 package Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs;
 
 use strict;
@@ -27,7 +20,7 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 #-----------------------------------------------------------------------------
 
@@ -42,14 +35,19 @@ sub violates {
     my ($self, $elem, $doc) = @_;
 
     my @exported_sub_names = ();
-    eval { @exported_sub_names = find_exported_subroutine_names( $doc ) };
+    eval {
+        @exported_sub_names = find_exported_subroutine_names( $doc );
+        1;
+    } or do {
 
-    if ( $EVAL_ERROR =~ m/Found \s multiple/mx ) {
-        my $pname = policy_short_name(__PACKAGE__);
-        my $fname = $doc->filename() || 'unknown';
-        warn qq{$pname: $EVAL_ERROR in file "$fname"\n};
-        return;
-    }
+        if ( $EVAL_ERROR =~ m/Found \s multiple/mxs ) {
+            my $pname = policy_short_name(__PACKAGE__);
+            my $fname = $doc->filename() || 'unknown';
+            warn qq{$pname: $EVAL_ERROR in file "$fname"\n};
+            return;
+        }
+
+    };
 
     my @declared_sub_names = find_declared_subroutine_names( $doc );
     my @declared_constants = find_declared_constant_names( $doc );
@@ -82,7 +80,7 @@ Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs
 
 =head1 AFFILIATION
 
-This policy is part of L<Perl::Critic::StricterSubs>.
+This policy is part of L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs>.
 
 =head1 DESCRIPTION
 

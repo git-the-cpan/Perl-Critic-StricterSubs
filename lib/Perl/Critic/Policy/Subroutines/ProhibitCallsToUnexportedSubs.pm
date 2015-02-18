@@ -1,10 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/Perl-Critic-StricterSubs/lib/Perl/Critic/Policy/Modules/ProhibitCallsToUnexportedSubs.pm $
-#     $Date: 2007-04-10 17:56:54 -0700 (Tue, 10 Apr 2007) $
-#   $Author: clonezone $
-# $Revision: 1439 $
-##############################################################################
-
 package Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs;
 
 use strict;
@@ -31,7 +24,7 @@ use Perl::Critic::StricterSubs::Utils qw{
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 #-----------------------------------------------------------------------------
 
@@ -193,7 +186,7 @@ sub _get_file_name_for_package_name {
 
 #-----------------------------------------------------------------------------
 
-sub _find_file_in_at_INC {
+sub _find_file_in_at_INC {  ## no critic (NamingConventions::Capitalization)
     my ($self, $partial_path) = @_;
 
     my $inc = $self->_get_inc();
@@ -234,44 +227,44 @@ Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs
 
 =head1 AFFILIATION
 
-This policy is part of L<Perl::Critic::StricterSubs>.
+This policy is part of L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs>.
 
 =head1 DESCRIPTION
 
 Many Perl modules define their public interface by exporting subroutines via
-L<Exporter>.  The goal of this Policy is to enforce encapsulation by by
+L<Exporter|Exporter>.  The goal of this Policy is to enforce encapsulation by by
 prohibiting calls to subroutines that are not listed in the callee's C<@EXPORT>
 or C<@EXPORT_OK>.
 
 =head1 LIMITATIONS
 
-This Policy does not properly deal with the L<only> pragma or modules that
-don't use L<Exporter> for their export mechanism, such as L<CGI>.  In the
+This Policy does not properly deal with the L<only|only> pragma or modules that
+don't use L<Exporter|Exporter> for their export mechanism, such as L<CGI|CGI>.  In the
 near future, we might fix this by allowing you configure the policy with
 a list of packages that are exempt from this policy.
 
 =head1 DIAGNOSTICS
 
-=over 8
+=over
 
 =item C<Subroutines::ProhibitCallsToUnexportedSubs: Cannot find source file>
 
 This warning usually indicates that the file under analysis includes modules
-that are not installed in this perl's <@INC> paths.  See L<"CONFIGURATION">
+that are not installed in this perl's <@INC> paths.  See L</"CONFIGURATION">
 for controlling the C<@INC> list this Policy.
 
 This warning can also happen when one of the included modules contains
 multiple packages, or if the package name doesn't match the file name.
-L<Perl::Critic> advises against both of these conditions, and has additional
+L<Perl::Critic|Perl::Critic> advises against both of these conditions, and has additional
 Policies to help enforce that.
 
 =back
 
 =head1 SEE ALSO
 
-L<Perl::Critic::Policy::Modules::ProhibitMultiplePackages>
+L<Perl::Critic::Policy::Modules::ProhibitMultiplePackages|Perl::Critic::Policy::Modules::ProhibitMultiplePackages>
 
-L<Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage>
+L<Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage|Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage>
 
 =head1 AUTHOR
 

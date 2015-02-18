@@ -1,0 +1,81 @@
+{
+   "abstract" : "Perl::Critic plugin for stricter subroutine checking",
+   "author" : [
+      "Jeffrey Thalhammer <thaljef@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-StricterSubs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::PathList" : "0",
+            "Perl::Critic" : "1.082",
+            "Perl::Critic::TestUtils" : "1.082",
+            "Perl::Critic::Utils" : "1.082",
+            "Perl::Critic::Violation" : "1.082"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : {
+         "file" : "lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs" : {
+         "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs" : {
+         "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUnexportedSubs.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs" : {
+         "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitExportingUndeclaredSubs.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations" : {
+         "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitQualifiedSubDeclarations.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::StricterSubs" : {
+         "file" : "lib/Perl/Critic/StricterSubs.pm",
+         "version" : "0.04"
+      },
+      "Perl::Critic::StricterSubs::Utils" : {
+         "file" : "lib/Perl/Critic/StricterSubs/Utils.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Perl-Critic/Perl-Critic-StricterSubs/issues"
+      },
+      "homepage" : "http://perlcritic.com",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/Perl-Critic/Perl-Critic-StricterSubs.git"
+      }
+   },
+   "version" : "0.04"
+}

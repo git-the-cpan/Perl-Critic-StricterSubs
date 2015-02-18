@@ -1,9 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/t/40_perlcriticrc $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
 
 severity = 1
 theme = core
@@ -20,10 +14,6 @@ theme = core
 [Documentation::RequirePodSections]
 lib_sections    = NAME|AFFILIATION|DESCRIPTION|AUTHOR|COPYRIGHT
 script_sections = NAME|AFFILIATION|DESCRIPTION|AUTHOR|COPYRIGHT
-
-# svn is good
-[Miscellanea::RequireRcsKeywords]
-keywords = URL Date Author Revision
 
 # No tabs, ever.
 [CodeLayout::ProhibitHardTabs]

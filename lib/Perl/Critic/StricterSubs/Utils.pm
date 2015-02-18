@@ -1,10 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/lib/Perl/Critic/StricterSubs/Utils.pm $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
-
 package Perl::Critic::StricterSubs::Utils;
 
 use strict;
@@ -27,7 +20,7 @@ use Perl::Critic::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 #-----------------------------------------------------------------------------
 
@@ -49,10 +42,15 @@ our @EXPORT_OK = qw{
 
 sub parse_simple_list {
     my ($list_node) = @_;
-    my $strings_ref = $list_node->find('PPI::Token::Quote');
-    return if not $strings_ref;
 
-    my @strings = map { $_->string() } @{ $strings_ref };
+    # Per RT 36783, lists may contain qw{...} strings as well as words. We
+    # don't need to look for nested lists because they are of interest only
+    # for their contents, which we get by looking for them directly.
+    my @strings = map { $_->string() }
+        @{ $list_node->find( 'PPI::Token::Quote' ) || [] };
+    push @strings, map { parse_quote_words( $_ ) }
+        @{ $list_node->find( 'PPI::Token::QuoteLike::Words' ) || [] };
+
     return @strings; #Just hoping that these are single words
 }
 
@@ -71,7 +69,7 @@ sub parse_literal_list {
 
 sub parse_quote_words {
     my ($qw_elem) = @_;
-    my ($word_string) = ( $qw_elem =~ m{\A qw. (.*) .\z}msx );
+    my ($word_string) = ( $qw_elem =~ m{\A qw \s* . (.*) .\z}msx );
     my @words = words_from_string( $word_string || $EMPTY );
     return @words;
 }
@@ -154,7 +152,7 @@ sub find_declared_subroutine_names {
     return if not $sub_nodes;
 
     my @sub_names = map { $_->name() } @{ $sub_nodes };
-    for (@sub_names) { s{\A .*::}{}mx };  # Remove leading package name
+    for (@sub_names) { s{\A .*::}{}mxs };  # Remove leading package name
     return @sub_names;
 }
 
@@ -188,21 +186,38 @@ sub _get_imports_from_use_statements {
     # arguments.
 
     my @schildren = $use_stmnt->schildren();
-    my @import_args = @schildren[2, -2];
+    my @import_args = @schildren[2 .. $#schildren - 1];
 
     my $first_import_arg = $import_args[0];
     return if not defined $first_import_arg;
 
-    return parse_quote_words( $first_import_arg )
-        if $first_import_arg->isa('PPI::Token::QuoteLike::Words');
+    # RT 43310 is a pathological case, which shows we can't simply look at the
+    # first token after the module name to tell what to do. So we iterate over
+    # the entire argument list, scavenging what we recognize, and hoping the
+    # rest is structure (commas and such).
+    my @result;
+    foreach my $import_rqst ( @import_args ) {
 
-    return parse_simple_list( $first_import_arg )
-        if $first_import_arg->isa('PPI::Structure::List');
+        defined $import_rqst
+            or next;
 
-    return parse_literal_list( @import_args )
-        if $first_import_arg->isa('PPI::Token::Quote');
+        if ( $import_rqst->isa( 'PPI::Token::QuoteLike::Words' ) ) {
 
-    return; #Don't know what to do!
+            push @result, parse_quote_words( $import_rqst );
+
+        } elsif ( $import_rqst->isa( 'PPI::Structure::List' ) ) {
+
+            push @result, parse_simple_list ( $import_rqst );
+
+        } elsif ( $import_rqst->isa( 'PPI::Token::Quote' ) ) {
+
+            push @result, $import_rqst->string();
+
+        }
+
+    }
+
+    return @result;
 
 }
 
@@ -291,6 +306,7 @@ sub _is_subroutine_call {
 
         return 0 if is_perl_builtin( $elem );
         return 0 if _smells_like_filehandle( $elem );
+        return 0 if _smells_like_label( $elem );
         return 1 if is_function_call( $elem );
 
     }
@@ -349,11 +365,56 @@ sub _smells_like_filehandle {
 
 #-----------------------------------------------------------------------------
 
+my %functions_that_take_labels =
+    hashify( qw( last next redo ) );
+
+# The following is cribbed shamelessly from _looks_like_filehandle. TRW
+
+sub _smells_like_label {
+    my ($elem) = @_;
+    return if not $elem;
+
+    #--------------------------------------------------------------------
+    # This handles calls *without* parens, for example:
+    # next FOO
+    # last BAR
+    # redo BAZ
+
+    if ( my $left_sib = $elem->sprevious_sibling ){
+        return exists $functions_that_take_labels{ $left_sib };
+    }
+
+    #--------------------------------------------------------------------
+    # This handles calls *with* parens, for example:
+    # next ( FOO )
+    # last ( BAR )
+    # redo ( BAZ )
+    #
+    # The above actually work, at least under 5.6.2 and 5.14.2.
+    # next { FOO }
+    # does _not_ work under those Perls, so we don't check for it.
+
+    my $expression = $elem->parent() || return;
+    my $enclosing_node = $expression->parent() || return;
+
+    return if ! ( $enclosing_node->isa('PPI::Structure::List') );
+
+    return if $enclosing_node->schild(0) != $expression;
+
+    if ( my $left_uncle = $enclosing_node->sprevious_sibling ){
+        return exists $functions_that_take_labels{ $left_uncle };
+    }
+
+    return;
+}
+
+#-----------------------------------------------------------------------------
+
 sub get_all_subs_from_list_of_symbols {
     my @symbols = @_;
 
-    my @sub_names = grep { m/\A [&\w]/mx } @symbols;
-    for (@sub_names) { s/\A &//mx; } # Remove optional sigil
+    my @sub_names = grep { m/\A [&\w]/mxs } @symbols;
+    for (@sub_names) { s/\A &//mxs; } # Remove optional sigil
 
     return @sub_names
 }
@@ -454,12 +515,12 @@ Perl::Critic::StricterSubs::Utils
 
 =head1 AFFILIATION
 
-This module is part of L<Perl::Critic::StricterSubs>.
+This module is part of L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs>.
 
 =head1 DESCRIPTION
 
 This module holds utility methods that are shared by other modules in the
-L<Perl::Critic::StricterSubs> distro.  Until this distro becomes more mature,
+L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs> distro.  Until this distro becomes more mature,
 I would discourage you from using these subs outside of this distro.
 
 =head1 IMPORTABLE SUBS
@@ -468,16 +529,16 @@ I would discourage you from using these subs outside of this distro.
 
 =item C<parse_quote_words( $qw_elem )>
 
-Gets the words from a L<PPI::Token::Quotelike::Words>.
+Gets the words from a L<PPI::Token::Quotelike::Words|PPI::Token::Quotelike::Words>.
 
 =item C<parse_simple_list( $list_node )>
 
-Returns the string literals from a L<PPI::Structure::List>.
+Returns the string literals from a L<PPI::Structure::List|PPI::Structure::List>.
 
 =item C<parse_literal_list( @nodes )>
 
 Returns the string literals contained anywhere in a collection of
-L<PPI::Node>s.
+L<PPI::Node|PPI::Node>s.
 
 =item C<find_declared_subroutine_names( $doc )>
 
@@ -569,7 +630,7 @@ stripped off; i.e. C<&foo> will be returned as "foo".
 
 =head1 SEE ALSO
 
-L<Exporter>
+L<Exporter|Exporter>
 
 =head1 AUTHOR
 

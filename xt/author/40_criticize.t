@@ -1,32 +1,14 @@
 #!perl
 
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/t/40_criticize.t $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
-
 # Self-compliance tests
 
 use strict;
 use warnings;
 use English qw( -no_match_vars );
 use File::Spec qw();
+
 use Test::More;
-
-#-----------------------------------------------------------------------------
-
-if ( !-d '.svn' && !$ENV{TEST_AUTHOR}) {
-    ## no critic (RequireInterpolation)
-    my $reason = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';
-    plan skip_all => $reason;
-}
-
-#-----------------------------------------------------------------------------
-
-eval { require Test::Perl::Critic; };
-plan skip_all => 'Test::Perl::Critic required to criticise code' if $EVAL_ERROR;
+use Test::Perl::Critic;
 
 #-----------------------------------------------------------------------------
 # Set up PPI caching for speed (used primarily during development)
@@ -46,7 +28,7 @@ if ( $ENV{PERL_CRITIC_CACHE} ) {
 #-----------------------------------------------------------------------------
 # Run critic against all of our own files
 
-my $rcfile = File::Spec->catfile( 't', '40_perlcriticrc' );
+my $rcfile = File::Spec->catfile( qw(xt author 40_perlcriticrc) );
 Test::Perl::Critic->import( -severity => 1, -profile => $rcfile );
 all_critic_ok();
 

@@ -1,8 +1,8 @@
 ##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/t/Modules/RequireExplicitInclusion.run $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
 ##############################################################################
 
 ## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.0 ] -----
@@ -246,6 +246,20 @@ Foo->bar( $arg1 )->baz( $arg2 );
 sub example {
     my $something = shift->method();
 }
+
+## name Allow __PACKAGE__->foo(). RT #43314 and 44609
+## failures 0
+## cut
+
+__PACKAGE__->foo();
+
+## name Still prohibit __PACKAGE__ in sub and var. RT #43314 and 44609
+## failures 3
+## cut
+
+__PACKAGE__::foo();
+&__PACKAGE__::foo();
+$__PACKAGE__::bar;
 
 ##############################################################################
 # Local Variables:

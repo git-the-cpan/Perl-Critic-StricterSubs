@@ -1,10 +1,3 @@
-##############################################################################
-#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-StricterSubs-0.03/lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm $
-#     $Date: 2008-01-13 18:30:52 -0800 (Sun, 13 Jan 2008) $
-#   $Author: thaljef $
-# $Revision: 2096 $
-##############################################################################
-
 package Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs;
 
 use strict;
@@ -28,7 +21,7 @@ use Perl::Critic::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 #-----------------------------------------------------------------------------
 
@@ -105,7 +98,7 @@ sub violates {
         next if is_qualified_name( $elem );
         next if $self->_is_exempt_subroutine( $elem, \@included_packages );
 
-        my ( $name ) = ( $elem =~ m{&?(\w+)}mx );
+        my ( $name ) = ( $elem =~ m{&?(\w+)}mxs );
         if ( not exists $defined_sub_names{$name} ){
             my $expl = q{This might be a major bug};
             my $desc = qq{Subroutine "$elem" is neither declared nor explicitly imported};
@@ -130,7 +123,7 @@ Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs
 
 =head1 AFFILIATION
 
-This policy is part of L<Perl::Critic::StricterSubs>.
+This policy is part of L<Perl::Critic::StricterSubs|Perl::Critic::StricterSubs>.
 
 =head1 DESCRIPTION
 
@@ -138,11 +131,11 @@ This Policy checks that every unqualified subroutine call has a matching
 subroutine declaration in the current file, or that it explicitly appears in
 the import list for one of the included modules.
 
-Some modules do not use the L<Exporter> interface, and rely on other
+Some modules do not use the L<Exporter|Exporter> interface, and rely on other
 mechanisms to export symbols into your code.  In those cases, this Policy will
 report a false violation.  However, you can instruct this policy to ignore a
 particular subroutine name, as long as the appropriate package has been
-included in your file.  See L<"CONFIGURATION"> for more details.
+included in your file.  See L</"CONFIGURATION"> for more details.
 
 =head1 CONFIGURATION
 
@@ -153,8 +146,8 @@ you to call the C<ok> and C<is> functions without explicitly importing or
 declaring those functions, as long as the C<Test::More> package has been
 included in the file somewhere.
 
- [Subroutines::ProhibitCallsToUndeclaredSubs]
- exempt_subs Test::More::ok Test::More::is
+    [Subroutines::ProhibitCallsToUndeclaredSubs]
+    exempt_subs = Test::More::ok Test::More::is
 
 By default, there are no exempt subroutines, but we're working on compiling a
 list of the most common ones.
