@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Module::Build" : "0.4"
          }
       },
       "configure" : {
@@ -26,42 +26,54 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "Exporter" : "0",
             "File::PathList" : "0",
-            "Perl::Critic" : "1.082",
-            "Perl::Critic::TestUtils" : "1.082",
+            "List::MoreUtils" : "0",
+            "PPI::Document" : "0",
+            "Perl::Critic::Policy" : "1.082",
             "Perl::Critic::Utils" : "1.082",
-            "Perl::Critic::Violation" : "1.082"
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic::TestUtils" : "1.082",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : {
          "file" : "lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUnexportedSubs.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitExportingUndeclaredSubs.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations" : {
          "file" : "lib/Perl/Critic/Policy/Subroutines/ProhibitQualifiedSubDeclarations.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::StricterSubs" : {
          "file" : "lib/Perl/Critic/StricterSubs.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Perl::Critic::StricterSubs::Utils" : {
          "file" : "lib/Perl/Critic/StricterSubs/Utils.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -77,5 +89,5 @@
          "url" : "git://github.com/Perl-Critic/Perl-Critic-StricterSubs.git"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05"
 }
